@@ -36,9 +36,10 @@ namespace IdentityServer4.Demo.Api
                 .AddInMemoryApiResources(Config.Config.ApiResources)
                 .AddInMemoryApiScopes(Config.Config.ApiScopes)
                 .AddProfileService<ProfileService>()
+                .AddResourceOwnerValidator<ResourceOwnerPasswordValidator>()
                 .AddDeveloperSigningCredential();
 
-            services.AddIdentity<IdentityUser, IdentityRole>( 
+            services.AddIdentity<User, AppRole>( 
                 options =>
                 {
                     options.Password.RequiredLength = 6;
@@ -48,15 +49,27 @@ namespace IdentityServer4.Demo.Api
                     options.Password.RequireUppercase = false;
                 }
                 )
+                .AddUserStore<AutocabUserStore>()
+                .AddRoleStore<AutocabRoleStore>()
                 .AddDefaultTokenProviders();
 
             services.AddTransient<IResourceOwnerPasswordValidator, ResourceOwnerPasswordValidator>();
             services.AddTransient<IProfileService, ProfileService>();
+            services.AddScoped<IUserRepository, UserRepository>();
+            services.AddTransient<IProfileService, AutocabUserManager>();
 
             services.AddControllersWithViews();
 
-            var appSetting = Configuration.GetSection("AppSettings").Get<AppSettings>();
-            services.AddSingleton(appSetting);
+            services.Configure<AppSettings>(Configuration.GetSection("AppSettings"));
+
+            services.AddAuthentication()
+        .AddGoogle("Google", options =>
+        {
+            options.SignInScheme = IdentityServerConstants.ExternalCookieAuthenticationScheme;
+
+            options.ClientId = "753172092252-hk0aqeh0he4nolc13mdr31og7nkd7rvt.apps.googleusercontent.com";
+            options.ClientSecret = "SfKXhy5eT6UdkWrl2uPEahs5";
+        });
 
         }
 

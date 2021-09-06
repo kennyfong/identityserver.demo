@@ -47,7 +47,7 @@ namespace IdentityServer4.Demo.WebApp.Controllers
                 httpClient.SetBearerToken(tokenResponse.AccessToken);
 
                 var result = httpClient
-                    .GetAsync("https://localhost:44353/weatherforcast")
+                    .GetAsync("https://localhost:44353/weatherforecast")
                     .Result;
 
                 if (result.IsSuccessStatusCode)
